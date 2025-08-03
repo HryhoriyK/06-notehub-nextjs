@@ -1,3 +1,5 @@
-const Home = () => {}
+import Main from "@/components/Main/Main";
 
-export default Home
+export default function Home() {
+    return <Main/>
+}
