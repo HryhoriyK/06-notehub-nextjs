@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useFetchNotes } from '@/hooks/useFetchNotes';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNote } from '@/lib/api';
-import type { CreateNoteParams, FetchNotesResponse } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { fetchNotes } from '@/lib/api';
+import type { FetchNotesResponse } from '@/lib/api';
 
 import { SearchBox } from '@/components/SearchBox/SearchBox';
 import { Pagination } from '@/components/Pagination/Pagination';
@@ -25,28 +24,14 @@ export default function Notes({ initialData }: NotesProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const queryClient = useQueryClient();
   const perPage = 12;
 
-  const { data, isLoading, isError } = useFetchNotes(
-    currentPage,
-    perPage,
-    debouncedSearch,
-    initialData
-  );
-
-  const { mutate: addNote } = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      setModalOpen(false);
-      setCurrentPage(1);
-    },
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['notes', currentPage, debouncedSearch],
+    queryFn: () => fetchNotes(currentPage, perPage, debouncedSearch),
+    placeholderData: initialData,
+    initialData,
   });
-
-  const handleCreateNote = (values: CreateNoteParams) => {
-    addNote(values);
-  };
 
   return (
     <div className={css.app}>
@@ -78,7 +63,7 @@ export default function Notes({ initialData }: NotesProps) {
 
       {isModalOpen && (
         <Modal onClose={() => setModalOpen(false)}>
-          <NoteForm onCancel={() => setModalOpen(false)} onSubmit={handleCreateNote} />
+          <NoteForm onCancel={() => setModalOpen(false)} />
         </Modal>
       )}
     </div>
