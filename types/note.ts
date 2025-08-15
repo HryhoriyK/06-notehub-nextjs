@@ -15,4 +15,4 @@ export const NoteTag = {
   Shopping: 'Shopping',
 } as const;
 
-export type NoteTag = keyof typeof NoteTag;
+export type NoteTag = typeof NoteTag[keyof typeof NoteTag];

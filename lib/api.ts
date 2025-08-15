@@ -36,6 +36,13 @@ export const fetchNotes = async (
   return res.data;
 };
 
+export const getNotes = async (
+  page: number,
+  perPage: number,
+  search?: string
+): Promise<FetchNotesResponse> => {
+  return fetchNotes(page, perPage, search);
+};
 
 export const createNote = async (
   noteData: CreateNoteParams

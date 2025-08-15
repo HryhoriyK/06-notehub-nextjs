@@ -1,21 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { useDebounce } from '../../hooks/useDebounce';
-import { useFetchNotes } from '../../hooks/useFetchNotes';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useFetchNotes } from '@/hooks/useFetchNotes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNote } from '../../lib/api';
-import type { CreateNoteParams } from '../../lib/api';
+import { createNote } from '@/lib/api';
+import type { CreateNoteParams, FetchNotesResponse } from '@/lib/api';
 
-import { SearchBox } from '../../components/SearchBox/SearchBox';
-import { Pagination } from '../../components/Pagination/Pagination';
-import { NoteList } from '../../components/NoteList/NoteList';
-import { Modal } from '../../components/Modal/Modal';
-import { NoteForm } from '../../components/NoteForm/NoteForm';
+import { SearchBox } from '@/components/SearchBox/SearchBox';
+import { Pagination } from '@/components/Pagination/Pagination';
+import { NoteList } from '@/components/NoteList/NoteList';
+import { Modal } from '@/components/Modal/Modal';
+import { NoteForm } from '@/components/NoteForm/NoteForm';
 
 import css from './page.module.css';
 
-export default function Notes() {
+interface NotesProps {
+  initialData: FetchNotesResponse;
+}
+
+export default function Notes({ initialData }: NotesProps) {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +31,8 @@ export default function Notes() {
   const { data, isLoading, isError } = useFetchNotes(
     currentPage,
     perPage,
-    debouncedSearch
+    debouncedSearch,
+    initialData
   );
 
   const { mutate: addNote } = useMutation({
